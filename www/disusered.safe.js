@@ -59,17 +59,18 @@ var safe = {
  * @returns {String} Encrypted file URI
  */
 function onSuccess(success, path) {
-  if (typeof success === 'function') {
-    window.requestFileSystem(window.PERSISTENT, 0, function(fs) {
-      fs.root.getFile(path.split('/').pop(), {create: false}, function(file) {
-        file.file(function(fileObj) {
-          success(fileObj);
-        }, onError);
-      }, onError);
-    }, onError);
-  }
+    success(path);
+    // commented by Jamil, move business to native...
+//  if (typeof success === 'function') {
+//    window.requestFileSystem(window.PERSISTENT, 0, function(fs) {
+//      fs.root.getFile(path, {create: true}, function(file) {
+//        file.file(function(fileObj) {
+//          success(fileObj);
+//        }, onError);
+//      }, onError);
+//    }, onError);
+// 
 }
-
 /**
  * onError
  *
