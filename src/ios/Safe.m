@@ -37,9 +37,7 @@
   NSString *path = [self crypto:@"decrypt" command:command];
 
   if (path != nil) {
-    pluginResult =
-        [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
-                          messageAsString:path];
+    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:path];
   } else {
     pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
   }
@@ -69,38 +67,50 @@
   BOOL fileExists = [fileManager fileExistsAtPath:path];
 
   // if path and password args exist
-  if (path != nil && [path length] > 0 && password != nil &&
+  if (filePath != nil && [filePath length] > 0 && password != nil &&
       [password length] > 0) {
+      
+      if (fileExists == NO) {
+              if ([fileManager copyItemAtPath: filePath toPath: path error: NULL]  == YES) {
+              fileExists = YES;
+                NSLog (@"Copy successful");
+              } else {
+                NSLog (@"Copy failed");
+              }
+      }
+      
 
-    // if file exists
-    if (fileExists) {
 
       // get file data
-      NSData *fileData = [NSData dataWithContentsOfFile:path];
+      NSData *fileData = [NSData dataWithContentsOfFile:filePath];
 
       NSError *error;
       if ([action isEqualToString:@"encrypt"]) {
         // encrypt data
-        data = [RNEncryptor encryptData:fileData
-                           withSettings:kRNCryptorAES256Settings
-                               password:password
-                                  error:&error];
+        data = [RNEncryptor encryptData:fileData withSettings:kRNCryptorAES256Settings password:password error:&error];
 
       } else if ([action isEqualToString:@"decrypt"]) {
         // decrypt data
-        data = [RNDecryptor decryptData:fileData
-                           withPassword:password
-                                  error:&error];
+        data = [RNDecryptor decryptData:fileData withPassword:password error:&error];
       }
 
       // write to generated path
-      [data writeToFile:path atomically:YES];
-    } else {
-      path = nil;
-    }
+      [data writeToFile:filePath atomically:YES];
+      
+      //Added by EtQ to fix the problem of copying the generated file
+//      [fileManager removeItemAtPath:filePath error:nil];
+//      if([fileManager fileExistsAtPath:path]){
+//          if ([fileManager copyItemAtPath: path toPath: filePath error: NULL]  == YES) {
+//            NSLog (@"Copy successful");
+//            [fileManager removeItemAtPath:path error:nil];
+//          } else {
+//            NSLog (@"Copy failed");
+//          }
+//      }
+     
   }
 
-  return path;
+  return filePath;
 }
 
 @end
