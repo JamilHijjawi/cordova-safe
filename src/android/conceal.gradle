@@ -14,6 +14,6 @@ dependencies {
 android {
   packagingOptions {
     exclude 'META-INF/NOTICE'
-    exclude 'META-INF/LICENSE'ty
+    exclude 'META-INF/LICENSE'
   }
 }
